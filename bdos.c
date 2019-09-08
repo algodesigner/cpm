@@ -41,6 +41,7 @@ struct bdos_s {
 	int restricted_mode;
     DIR *dp;
     unsigned sfn;
+    char str[259];
 };
 
 bdos *bdos_new(vm *vm, bios *bios)
@@ -85,7 +86,8 @@ static void killprompt()
 static char *rdcmdline(bdos *obj, z80info *z80, int max, int ctrl_c_enable)
 {
     int i, c;
-    static char s[259];
+    char *s;
+    s = obj->str;
 
     fflush(stdout);
     max &= 0xff;
@@ -282,6 +284,12 @@ static void delfp(bdos *obj, z80info *z80, unsigned where) {
 	    return;
 	}
     fcberr(obj, z80, where);
+}
+
+static word execunix(bdos *obj, z80info *z80, unsigned where) {
+	(void)obj;
+	fflush(stdout);
+    return system((char *)z80->mem + where);
 }
 
 /* FCB fields */
@@ -941,6 +949,18 @@ void bdos_check_hook(bdos *obj, z80info *z80) {
 	HL = (obj->restricted_mode || chdir((char  *)(z80->mem + DE))) ? 0xff : 0x00;
         B = H; A = L;
 	break;
+	case 253:
+		len = obj->str[0];
+		for (i = 0; i < (int)len && (z80->mem[DE + i] = obj->str[i + 1]); i++);
+		HL = 0;
+		B = H;
+		A = L;
+		break;
+	case 254:
+		HL = execunix(obj, z80, DE);
+		B = H;
+		A = L;
+		break;
     default:
 	printf("\n\nUnrecognized BDOS-Function:\n");
 	printf("AF=%04x  BC=%04x  DE=%04x  HL=%04x  SP=%04x\nStack =",
