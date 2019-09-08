@@ -1,0 +1,36 @@
+; sh.z80
+; Executes a command in the outer shell
+
+cline           equ     080h
+bdos            equ     5
+lastbuf         equ     253             ; Experimental LASTBUF BDOS function
+shexec          equ     254             ; Experumental SHEXEC BDOS function
+
+                ld      de, buffer      ; Retrieve the last string buffer
+                push    de              ; In this context, it should contain
+                ld      c, lastbuf      ; the command line with lower and upper
+                call    bdos            ; cases characters
+
+                pop     de              ; DE <- string buffer 
+                inc     de              ; Skip the app name
+                inc     de
+                ld      a,(de)
+                or      a
+                jr      z,usage         ; Print usage and return
+                                        ; if no arguments provided
+
+                inc     de              ; Skip the space
+                ld      c,shexec        ; BDOS shell ext. function
+                call    bdos
+                ret
+
+usage:          ld      de,message
+                ld      c,9
+                call    bdos
+                ret
+
+message:        defm    "Usage: sh <command>"
+                defb    0dh, 0ah, '$'
+buffer:
+
+
