@@ -3,8 +3,8 @@
 
 cline           equ     080h
 bdos            equ     5
-lastbuf         equ     253             ; Experimental LASTBUF BDOS function
-shexec          equ     254             ; Experumental SHEXEC BDOS function
+lastbuf         equ     201             ; Experimental LASTBUF BDOS function
+shexec          equ     202             ; Experumental SHEXEC BDOS function
 
                 ld      de, buffer      ; Retrieve the last string buffer
                 push    de              ; In this context, it should contain

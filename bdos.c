@@ -949,14 +949,14 @@ void bdos_check_hook(bdos *obj, z80info *z80) {
 	HL = (obj->restricted_mode || chdir((char  *)(z80->mem + DE))) ? 0xff : 0x00;
         B = H; A = L;
 	break;
-	case 253:
+	case 201:
 		len = obj->str[0];
 		for (i = 0; i < (int)len && (z80->mem[DE + i] = obj->str[i + 1]); i++);
 		HL = 0;
 		B = H;
 		A = L;
 		break;
-	case 254:
+	case 202:
 		HL = execunix(obj, z80, DE);
 		B = H;
 		A = L;
